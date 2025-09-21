@@ -1,0 +1,239 @@
+/* 全局样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f5f7fa;
+  color: #303133;
+  line-height: 1.6;
+}
+
+#app {
+  min-height: 100vh;
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 卡片样式 */
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* 状态指示器 */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.status-active {
+  background-color: #67c23a;
+}
+
+.status-inactive {
+  background-color: #f56c6c;
+}
+
+.status-error {
+  background-color: #e6a23c;
+}
+
+.status-unknown {
+  background-color: #909399;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .card {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+}
+
+/* 动画效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.slide-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-leave-to {
+  transform: translateX(100%);
+}
+
+/* 工具类 */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 加载动画 */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+/* 空状态 */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #909399;
+}
+
+.empty-state .el-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+/* 统计卡片 */
+.stat-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+}
+
+.stat-card .stat-number {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.stat-card .stat-label {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 节点卡片 */
+.node-card {
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.node-card:hover {
+  border-color: #409eff;
+  box-shadow: 0 2px 12px rgba(64, 158, 255, 0.1);
+}
+
+.node-card.selected {
+  border-color: #409eff;
+  background-color: #f0f9ff;
+}
+
+/* 二维码样式 */
+.qr-code-container {
+  text-align: center;
+  padding: 20px;
+}
+
+.qr-code-container img {
+  max-width: 200px;
+  height: auto;
+}
+
+/* 表格样式增强 */
+.el-table .el-table__row:hover {
+  background-color: #f5f7fa;
+}
+
+.el-table .status-cell {
+  display: flex;
+  align-items: center;
+}
+
+/* 标签样式 */
+.node-tag {
+  margin-right: 8px;
+  margin-bottom: 4px;
+}
+
+/* 响应式表格 */
+@media (max-width: 768px) {
+  .el-table {
+    font-size: 12px;
+  }
+  
+  .el-table .cell {
+    padding: 8px 4px;
+  }
+}
