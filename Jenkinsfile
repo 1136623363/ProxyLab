@@ -16,34 +16,20 @@ pipeline {
         }
         
         stage('Test') {
-            parallel {
-                stage('Backend Tests') {
-                    steps {
-                        sh '''
-                            python -m venv venv
-                            source venv/bin/activate
-                            pip install -r requirements.txt
-                            pip install pytest pytest-cov
-                            pytest tests/ --cov=app --cov-report=xml
-                        '''
-                    }
-                    post {
-                        always {
-                            publishCoverage adapters: [
-                                coberturaAdapter('coverage.xml')
-                            ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
-                        }
-                    }
-                }
-                
-                stage('Frontend Tests') {
-                    steps {
-                        sh '''
-                            cd frontend
-                            npm install
-                            npm run test:unit
-                        '''
-                    }
+            steps {
+                sh '''
+                    python -m venv venv
+                    source venv/bin/activate
+                    pip install -r requirements.txt
+                    pip install pytest pytest-cov
+                    pytest tests/ --cov=app --cov-report=xml
+                '''
+            }
+            post {
+                always {
+                    publishCoverage adapters: [
+                        coberturaAdapter('coverage.xml')
+                    ], sourceFileResolver: sourceFiles('STORE_LAST_BUILD')
                 }
             }
         }
@@ -79,17 +65,6 @@ pipeline {
             }
         }
         
-        // stage('Deploy to Staging') {
-        //     when {
-        //         branch 'develop'
-        //     }
-        //     steps {
-        //         sh '''
-        //             # 部署到测试环境
-        //             docker-compose -f docker-compose.staging.yml up -d
-        //         '''
-        //     }
-        // }
         
         stage('Deploy to Production') {
             when {

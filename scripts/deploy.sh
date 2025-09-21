@@ -6,7 +6,7 @@ set -e
 # 配置
 DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME:-yourusername}
 IMAGE_NAME="proxylab"
-ENVIRONMENT=${1:-staging}
+ENVIRONMENT=${1:-production}
 
 echo "🚀 开始部署到 $ENVIRONMENT 环境..."
 
@@ -22,13 +22,8 @@ echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 
 # 拉取最新镜像
 echo "📥 拉取最新镜像..."
-if [ "$ENVIRONMENT" = "production" ]; then
-    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
-    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME-frontend:latest
-else
-    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:develop
-    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME-frontend:develop
-fi
+docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME-frontend:latest
 
 # 停止现有服务
 echo "🛑 停止现有服务..."
