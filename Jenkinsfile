@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
-        DOCKERHUB_USERNAME = 'your-dockerhub-username'
+        DOCKERHUB_USERNAME = '1136623363'
         IMAGE_NAME = 'proxylab'
         REGISTRY = 'docker.io'
     }
@@ -79,17 +79,17 @@ pipeline {
             }
         }
         
-        stage('Deploy to Staging') {
-            when {
-                branch 'develop'
-            }
-            steps {
-                sh '''
-                    # 部署到测试环境
-                    docker-compose -f docker-compose.staging.yml up -d
-                '''
-            }
-        }
+        // stage('Deploy to Staging') {
+        //     when {
+        //         branch 'develop'
+        //     }
+        //     steps {
+        //         sh '''
+        //             # 部署到测试环境
+        //             docker-compose -f docker-compose.staging.yml up -d
+        //         '''
+        //     }
+        // }
         
         stage('Deploy to Production') {
             when {
