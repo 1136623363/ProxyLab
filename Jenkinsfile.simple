@@ -1,0 +1,59 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKERHUB_USERNAME = '1136623363'
+        IMAGE_NAME = 'proxylab'
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                script {
+                    // 构建后端镜像
+                    def backendImage = docker.build("${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${env.BUILD_NUMBER}")
+                    
+                    // 构建前端镜像
+                    def frontendImage = docker.build("${DOCKERHUB_USERNAME}/${IMAGE_NAME}-frontend:${env.BUILD_NUMBER}", "./frontend")
+                    
+                    // 标记为latest（仅main分支）
+                    if (env.BRANCH_NAME == 'main') {
+                        sh "docker tag ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${env.BUILD_NUMBER} ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
+                        sh "docker tag ${DOCKERHUB_USERNAME}/${IMAGE_NAME}-frontend:${env.BUILD_NUMBER} ${DOCKERHUB_USERNAME}/${IMAGE_NAME}-frontend:latest"
+                    }
+                }
+            }
+        }
+        
+        stage('Push to Docker Hub') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    docker.withRegistry("https://docker.io", 'dockerhub-credentials') {
+                        sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:${env.BUILD_NUMBER}"
+                        sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}-frontend:${env.BUILD_NUMBER}"
+                        
+                        if (env.BRANCH_NAME == 'main') {
+                            sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}:latest"
+                            sh "docker push ${DOCKERHUB_USERNAME}/${IMAGE_NAME}-frontend:latest"
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
