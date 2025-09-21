@@ -23,11 +23,7 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # 生产阶段
 FROM python:3.11-slim
 
-# 安装运行时依赖
-RUN apt-get update && apt-get install -y \
-    libffi7 \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+# Python 3.11-slim 已经包含了运行所需的基本库
 
 # 创建非root用户
 RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser
