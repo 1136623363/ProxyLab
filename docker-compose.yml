@@ -1,10 +1,8 @@
-# Docker Compose 文件
+# Docker Compose 文件 - 从Docker Hub拉取镜像
 
 services:
   app:
-    build: 
-      context: .
-      dockerfile: Dockerfile
+    image: 1136623363/proxylab:latest
     ports:
       - "8001:8001"
     volumes:
@@ -38,26 +36,6 @@ services:
     networks:
       - app-network
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
-    depends_on:
-      - app
-    restart: unless-stopped
-    networks:
-      - app-network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
-        reservations:
-          memory: 128M
-          cpus: '0.25'
-
   nginx:
     image: nginx:alpine
     ports:
@@ -68,7 +46,6 @@ services:
       - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - app
-      - frontend
     restart: unless-stopped
     networks:
       - app-network

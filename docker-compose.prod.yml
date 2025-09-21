@@ -1,8 +1,10 @@
-# 生产环境配置
+# 生产环境配置 - 从Docker Hub拉取镜像
 services:
   app:
-    image: ${DOCKERHUB_USERNAME:-yourusername}/proxylab:latest
+    image: 1136623363/proxylab:latest
     restart: unless-stopped
+    ports:
+      - "8001:8001"
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - SECRET_KEY=${SECRET_KEY}
@@ -32,20 +34,6 @@ services:
       timeout: 10s
       start_period: 40s
       retries: 3
-
-  frontend:
-    image: ${DOCKERHUB_USERNAME:-yourusername}/proxylab-frontend:latest
-    restart: unless-stopped
-    networks:
-      - app-network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.5'
-        reservations:
-          memory: 128M
-          cpus: '0.25'
 
   nginx:
     image: nginx:alpine

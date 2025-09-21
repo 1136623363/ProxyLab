@@ -23,7 +23,6 @@ echo $DOCKERHUB_TOKEN | docker login -u $DOCKERHUB_USERNAME --password-stdin
 # 拉取最新镜像
 echo "📥 拉取最新镜像..."
 docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
-docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME-frontend:latest
 
 # 停止现有服务
 echo "🛑 停止现有服务..."

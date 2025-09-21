@@ -11,7 +11,7 @@
 - 🔐 **用户管理**: 多用户支持和权限控制
 - 📈 **统计分析**: 使用统计和性能分析
 - 🌐 **Web界面**: 现代化的Vue.js前端界面
-- 🐳 **容器化**: 完整的Docker支持
+- 🐳 **容器化**: 完整的Docker支持，单镜像部署
 
 ## 🚀 快速开始
 
@@ -19,7 +19,7 @@
 
 1. **克隆项目**
 ```bash
-git clone https://github.com/yourusername/ProxyLab.git
+git clone https://github.com/1136623363/ProxyLab.git
 cd ProxyLab
 ```
 
@@ -35,9 +35,9 @@ docker-compose up -d
 ```
 
 4. **访问应用**
-- 前端界面: http://localhost:3000
-- 后端API: http://localhost:8001
+- 应用界面: http://localhost:8001
 - API文档: http://localhost:8001/docs
+- 健康检查: http://localhost:8001/health
 
 ### 手动安装
 
@@ -140,14 +140,19 @@ DATABASE_URL=postgresql://username:password@localhost:5432/subscription_converte
 
 ## 🐳 Docker部署
 
-### 单容器部署
+### 从Docker Hub部署
 ```bash
+# 拉取镜像
+docker pull 1136623363/proxylab:latest
+
+# 运行容器
 docker run -d \
   --name proxylab \
   -p 8001:8001 \
   -e SECRET_KEY="your-secret-key" \
   -v ./data:/app/data \
-  proxylab:latest
+  -v ./logs:/app/logs \
+  1136623363/proxylab:latest
 ```
 
 ### Docker Compose部署
@@ -157,6 +162,16 @@ docker-compose up -d
 
 # 生产环境
 docker-compose -f docker-compose.prod.yml up -d
+```
+
+### 更新应用
+```bash
+# 拉取最新镜像
+docker pull 1136623363/proxylab:latest
+
+# 重启服务
+docker-compose down
+docker-compose up -d
 ```
 
 ## 📊 监控和维护
@@ -242,6 +257,22 @@ npm run dev
 - JavaScript: 使用ESLint
 - 提交信息: 使用约定式提交
 
+## 🔧 CI/CD
+
+项目使用GitHub Actions进行自动化构建和部署：
+
+- **自动构建**: 推送代码到main分支自动构建Docker镜像
+- **自动推送**: 构建完成后自动推送到Docker Hub
+- **单镜像部署**: 前端和后端整合到一个镜像中
+
+### 配置GitHub Actions
+
+1. 在GitHub仓库中配置Secrets：
+   - `DOCKERHUB_USERNAME`: 1136623363
+   - `DOCKERHUB_TOKEN`: 您的Docker Hub访问令牌
+
+2. 推送代码即可自动构建和部署
+
 ## 🤝 贡献指南
 
 1. Fork 项目
@@ -252,7 +283,7 @@ npm run dev
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+本项目采用 MIT 许可证。
 
 ## 🙏 致谢
 
@@ -260,15 +291,6 @@ npm run dev
 - [Vue.js](https://vuejs.org/) - 渐进式JavaScript框架
 - [Element Plus](https://element-plus.org/) - Vue 3组件库
 - [SQLAlchemy](https://www.sqlalchemy.org/) - Python SQL工具包
-
-## 📞 支持
-
-如果您遇到问题或有建议，请：
-
-1. 查看 [文档](docs/)
-2. 搜索 [Issues](https://github.com/yourusername/ProxyLab/issues)
-3. 创建新的 Issue
-4. 联系维护者
 
 ---
 

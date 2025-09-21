@@ -1,5 +1,15 @@
-# 多阶段构建 - 优化版本
-FROM python:3.11-slim as builder
+# 多阶段构建 - 整合前后端
+FROM node:18-alpine as frontend-builder
+
+# 构建前端
+WORKDIR /app/frontend
+COPY frontend/package*.json ./
+RUN npm ci --frozen-lockfile
+COPY frontend/ .
+RUN node node_modules/vite/bin/vite.js build
+
+# Python后端构建阶段
+FROM python:3.11-slim as backend-builder
 
 # 设置工作目录
 WORKDIR /app
@@ -23,22 +33,23 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
 # 生产阶段
 FROM python:3.11-slim
 
-# Python 3.11-slim 已经包含了运行所需的基本库
-
 # 创建非root用户
 RUN groupadd -r appuser && useradd -r -g appuser -d /app -s /bin/bash appuser
 
 # 设置工作目录
 WORKDIR /app
 
-# 从builder阶段复制虚拟环境
-COPY --from=builder /opt/venv /opt/venv
+# 从backend-builder阶段复制虚拟环境
+COPY --from=backend-builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# 复制应用代码（排除不必要的文件）
+# 复制后端应用代码
 COPY --chown=appuser:appuser app/ ./app/
 COPY --chown=appuser:appuser config.py ./
 COPY --chown=appuser:appuser run.py ./
+
+# 从frontend-builder阶段复制构建的前端文件
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/dist ./static/frontend/
 
 # 创建必要的目录
 RUN mkdir -p static data logs && \
