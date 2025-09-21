@@ -12,8 +12,8 @@ RUN npm ci --frozen-lockfile
 # 复制源代码
 COPY . .
 
-# 构建应用（使用npx避免权限问题）
-RUN npx vite build
+# 构建应用（使用完整路径避免权限问题）
+RUN ./node_modules/.bin/vite build
 
 # 运行阶段
 FROM nginx:alpine
