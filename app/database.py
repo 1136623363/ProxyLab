@@ -22,10 +22,7 @@ if "sqlite" in DATABASE_URL:
     connect_args = {
         "check_same_thread": False,
         "timeout": 30,
-        "isolation_level": None,
-        "cache_size": 10000,  # 增加缓存大小
-        "journal_mode": "WAL",  # 使用WAL模式提高并发性能
-        "synchronous": "NORMAL"  # 平衡性能和安全性
+        "isolation_level": None
     }
 
 # 根据数据库类型优化连接池配置
