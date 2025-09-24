@@ -17,6 +17,10 @@ class Config:
     # 数据库配置
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./data/subscription_converter.db")
     
+    # 调试配置
+    DEBUG: bool = os.getenv("DEBUG", "false").lower() in ("true", "1", "yes", "on")
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "info")
+    
     # 安全配置
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-this-in-production")
     ALGORITHM: str = "HS256"

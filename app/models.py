@@ -190,20 +190,36 @@ class OutputFormat(str, Enum):
     V2RAYN = "v2rayn"
     RAW = "raw"
 
-class NodeFilter(BaseModel):
-    countries: Optional[List[str]] = None
-    regions: Optional[List[str]] = None
-    node_types: Optional[List[NodeType]] = None
-    max_latency: Optional[float] = None
-    exclude_keywords: Optional[List[str]] = None
-    include_keywords: Optional[List[str]] = None
-    skip: int = 0
-    limit: int = 100
-    sort_by: Optional[str] = None
+# 节点状态枚举
+class NodeStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    ERROR = "error"
+    UNKNOWN = "unknown"
+    DISABLED = "disabled"
 
+# 节点检查结果模型
+class NodeCheckResult(BaseModel):
+    node_id: int
+    status: NodeStatus
+    ping_latency: Optional[float] = None
+    error_message: Optional[str] = None
+
+# 批量节点检查请求
+class BulkNodeCheck(BaseModel):
+    node_ids: Optional[List[int]] = None
+
+# 节点过滤器
+class NodeFilter(BaseModel):
+    countries: Optional[str] = None
+    node_types: Optional[str] = None
+    max_latency: Optional[float] = None
+
+# 订阅输出配置
 class SubscriptionOutput(BaseModel):
     format: OutputFormat
-    filter: Optional[NodeFilter] = None
+    filters: Optional[NodeFilter] = None
+    user_id: Optional[int] = None
     group_id: Optional[int] = None
 
 # 节点检测模型

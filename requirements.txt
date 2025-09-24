@@ -26,3 +26,6 @@ apscheduler>=3.10.4
 
 # Production server
 gunicorn>=21.2.0
+
+# Additional dependencies for full functionality
+pillow>=10.0.0

@@ -1,16 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 import json
-
-# 北京时区 (UTC+8)
-BEIJING_TZ = timezone(timedelta(hours=8))
-
-def beijing_now():
-    """获取当前北京时间"""
-    return datetime.now(BEIJING_TZ)
-from app.database import get_db, User, SubscriptionLink, Node, InputRecord
+from app.database import get_db, User, SubscriptionLink, Node, InputRecord, beijing_now
 from app.database import generate_unique_link_id
 from app.auth import get_current_active_user
 from app.output.output_factory import OutputFactory
