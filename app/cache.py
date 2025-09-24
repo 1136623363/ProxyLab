@@ -1,16 +1,17 @@
 from typing import Any, Optional, Dict
 import asyncio
 import time
+import hashlib
 from functools import wraps
 import json
-import hashlib
 
 class SimpleCache:
     """简单的内存缓存实现"""
     
-    def __init__(self, default_ttl: int = 300):
+    def __init__(self, default_ttl: int = 300, max_size: int = 1000):
         self.cache: Dict[str, Dict[str, Any]] = {}
         self.default_ttl = default_ttl
+        self.max_size = max_size
     
     def _generate_key(self, prefix: str, *args, **kwargs) -> str:
         """生成缓存键"""
@@ -39,9 +40,14 @@ class SimpleCache:
         if ttl is None:
             ttl = self.default_ttl
         
+        # 检查缓存大小限制
+        if len(self.cache) >= self.max_size:
+            self._evict_oldest()
+        
         self.cache[key] = {
             'value': value,
-            'expires_at': time.time() + ttl
+            'expires_at': time.time() + ttl,
+            'created_at': time.time()
         }
     
     def delete(self, key: str) -> None:
@@ -62,6 +68,15 @@ class SimpleCache:
         ]
         for key in expired_keys:
             del self.cache[key]
+    
+    def _evict_oldest(self) -> None:
+        """移除最旧的缓存项"""
+        if not self.cache:
+            return
+        
+        # 找到最旧的项
+        oldest_key = min(self.cache.keys(), key=lambda k: self.cache[k].get('created_at', 0))
+        del self.cache[oldest_key]
 
 # 全局缓存实例
 cache = SimpleCache(default_ttl=300)  # 默认5分钟过期

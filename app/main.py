@@ -156,83 +156,88 @@ app.include_router(redirect.router, tags=["Redirect"])
 
 @app.get("/")
 async def root():
-    """Root path, returns frontend page"""
-    return HTMLResponse(content="""
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Subscription Converter</title>
-        <style>
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                margin: 0;
-                padding: 20px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-            }
-            .container {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: white;
-                border-radius: 10px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                overflow: hidden;
-            }
-            .header {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                padding: 40px;
-                text-align: center;
-            }
-            .header h1 {
-                margin: 0;
-                font-size: 2.5em;
-                font-weight: 300;
-            }
-            .header p {
-                margin: 10px 0 0 0;
-                opacity: 0.9;
-                font-size: 1.1em;
-            }
-            .content {
-                padding: 40px;
-            }
-            .cta {
-                text-align: center;
-                margin: 40px 0;
-            }
-            .btn {
-                display: inline-block;
-                padding: 15px 30px;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                color: white;
-                text-decoration: none;
-                border-radius: 25px;
-                font-weight: 500;
-                transition: transform 0.3s ease;
-            }
-            .btn:hover {
-                transform: translateY(-2px);
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <div class="header">
-                <h1>Subscription Converter</h1>
-                <p>Powerful subscription link conversion and management system</p>
-            </div>
-            <div class="content">
-                <div class="cta">
-                    <a href="/docs" class="btn">View API Documentation</a>
+    """Root path, serves frontend index.html"""
+    try:
+        with open("static/index.html", "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        # 如果前端文件不存在，返回简单的欢迎页面
+        return HTMLResponse(content="""
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Subscription Converter</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    margin: 0;
+                    padding: 20px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    min-height: 100vh;
+                }
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    background: white;
+                    border-radius: 10px;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                    overflow: hidden;
+                }
+                .header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 40px;
+                    text-align: center;
+                }
+                .header h1 {
+                    margin: 0;
+                    font-size: 2.5em;
+                    font-weight: 300;
+                }
+                .header p {
+                    margin: 10px 0 0 0;
+                    opacity: 0.9;
+                    font-size: 1.1em;
+                }
+                .content {
+                    padding: 40px;
+                }
+                .cta {
+                    text-align: center;
+                    margin: 40px 0;
+                }
+                .btn {
+                    display: inline-block;
+                    padding: 15px 30px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    font-weight: 500;
+                    transition: transform 0.3s ease;
+                }
+                .btn:hover {
+                    transform: translateY(-2px);
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>Subscription Converter</h1>
+                    <p>Powerful subscription link conversion and management system</p>
+                </div>
+                <div class="content">
+                    <div class="cta">
+                        <a href="/docs" class="btn">View API Documentation</a>
+                    </div>
                 </div>
             </div>
-        </div>
-    </body>
-    </html>
-    """)
+        </body>
+        </html>
+        """)
 
 @app.get("/health")
 async def health_check():

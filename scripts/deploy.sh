@@ -38,11 +38,11 @@ sleep 30
 
 # 健康检查
 echo "🏥 执行健康检查..."
-if curl -f http://localhost:8001/health > /dev/null 2>&1; then
+if curl -f http://localhost:8899/health > /dev/null 2>&1; then
     echo "✅ 部署成功！"
-    echo "🌐 前端地址: http://localhost:3000"
-    echo "🔧 后端地址: http://localhost:8001"
-    echo "📚 API文档: http://localhost:8001/docs"
+    echo "🌐 应用地址: http://localhost:8899"
+    echo "📚 API文档: http://localhost:8899/docs"
+    echo "🔧 健康检查: http://localhost:8899/health"
 else
     echo "❌ 健康检查失败，请检查日志"
     docker-compose -f docker-compose.$ENVIRONMENT.yml logs

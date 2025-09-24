@@ -77,9 +77,10 @@ async def create_input_record(
             response.raise_for_status()
             content = response.text
         except Exception as e:
+            logger.error(f"获取URL内容失败: {str(e)}")
             raise HTTPException(
                 status_code=400,
-                detail=f"无法获取URL内容: {str(e)}"
+                detail="无法获取URL内容，请检查链接是否有效"
             )
     
     # 如果用户提供数据，使用URL内容
@@ -97,9 +98,10 @@ async def create_input_record(
             response.raise_for_status()
             content = response.text
         except Exception as e:
+            logger.error(f"获取URL内容失败: {str(e)}")
             raise HTTPException(
                 status_code=400,
-                detail=f"无法获取URL内容: {str(e)}"
+                detail="无法获取URL内容，请检查链接是否有效"
             )
     
     if not content:
@@ -167,12 +169,7 @@ async def create_input_record(
     db.commit()
     db.refresh(db_record)
     
-    # 保存内容到文件
-    content_file_path = save_content_to_file(content, db_record.id)
-    db_record.content_file_path = content_file_path
-    db.commit()
-    
-    # 解析内容并创建节点
+    # 解析内容并创建节点（在事务中完成）
     try:
         from app.models import InputType
         # 如果已经获取了URL内容，应该使用TEXT类型进行解析，而不是URL类型
@@ -184,9 +181,7 @@ async def create_input_record(
         
         # 检查是否有有效节点
         if not nodes_data or len(nodes_data) == 0:
-            # 删除已创建的记录
-            db.delete(db_record)
-            db.commit()
+            db.rollback()  # 回滚事务
             raise HTTPException(
                 status_code=400,
                 detail="订阅内容中没有找到有效的节点，请检查订阅链接或内容是否正确"
@@ -201,13 +196,15 @@ async def create_input_record(
             valid_nodes.append(node_data)
         
         if not valid_nodes:
-            # 删除已创建的记录
-            db.delete(db_record)
-            db.commit()
+            db.rollback()  # 回滚事务
             raise HTTPException(
                 status_code=400,
                 detail="订阅内容中的节点数据不完整，缺少必要字段（名称、地址、端口）"
             )
+        
+        # 保存内容到文件
+        content_file_path = save_content_to_file(content, db_record.id)
+        db_record.content_file_path = content_file_path
         
         # 创建有效节点
         for node_data in valid_nodes:

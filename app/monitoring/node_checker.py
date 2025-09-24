@@ -40,15 +40,19 @@ class NodeChecker:
         
         return result
     
-    async def check_nodes_batch(self, node_ids: List[int]) -> Dict[int, Dict[str, Any]]:
+    async def check_nodes_batch(self, node_ids: List[int], max_concurrent: int = 10) -> Dict[int, Dict[str, Any]]:
         """Check multiple nodes by IDs (optimized for batch processing)"""
         results = {}
         
+        # 限制并发数量，避免资源耗尽
+        semaphore = asyncio.Semaphore(max_concurrent)
+        
+        async def check_with_semaphore(node_id: int):
+            async with semaphore:
+                return await self._check_node_connectivity_batch(node_id)
+        
         # 批量检测节点连接性
-        tasks = []
-        for node_id in node_ids:
-            task = self._check_node_connectivity_batch(node_id)
-            tasks.append(task)
+        tasks = [check_with_semaphore(node_id) for node_id in node_ids]
         
         # 并发执行所有检测任务
         batch_results = await asyncio.gather(*tasks, return_exceptions=True)
