@@ -43,6 +43,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
+    email: str
     is_active: bool
     is_admin: bool
     last_login: Optional[datetime] = None

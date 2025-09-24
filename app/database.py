@@ -297,7 +297,17 @@ def get_db():
 
 def create_tables():
     """创建数据库表"""
-    Base.metadata.create_all(bind=engine)
+    try:
+        # 使用 checkfirst=True 参数，如果表已存在则跳过
+        Base.metadata.create_all(bind=engine, checkfirst=True)
+    except Exception as e:
+        # 如果表已存在，这是正常的，不需要抛出错误
+        if "already exists" in str(e) or "table" in str(e).lower():
+            print("ℹ️ 数据库表已存在，跳过创建")
+        else:
+            # 其他错误才抛出
+            print(f"❌ 创建数据库表时出现错误: {e}")
+            raise
 
 def generate_unique_link_id():
     """生成唯一的订阅链接ID"""
@@ -306,8 +316,12 @@ def generate_unique_link_id():
 def init_database():
     """初始化数据库并创建默认admin用户"""
     # 创建表
-    create_tables()
-    print("✅ 数据库表创建成功")
+    try:
+        create_tables()
+        print("✅ 数据库表创建成功")
+    except Exception as e:
+        print(f"⚠️ 数据库表创建出现问题: {e}")
+        # 继续执行，不阻止应用启动
     
     # 创建默认admin用户
     db = SessionLocal()
