@@ -312,10 +312,10 @@ def init_database():
     # 创建默认admin用户
     db = SessionLocal()
     try:
-        # 检查是否已有用户
-        existing_user = db.query(User).first()
-        if existing_user:
-            print("ℹ️ 用户已存在，跳过创建默认用户")
+        # 检查是否已有admin用户
+        existing_admin = db.query(User).filter(User.username == "admin").first()
+        if existing_admin:
+            print("ℹ️ 管理员用户已存在，跳过创建默认用户")
             return
         
         # 创建默认管理员用户
@@ -345,6 +345,11 @@ def init_database():
     except Exception as e:
         print(f"❌ 创建默认用户失败: {e}")
         db.rollback()
-        raise
+        # 如果是唯一约束错误，说明用户已存在，这是正常的
+        if "UNIQUE constraint failed" in str(e) or "IntegrityError" in str(e):
+            print("ℹ️ 用户已存在，跳过创建默认用户")
+        else:
+            # 其他错误才抛出
+            raise
     finally:
         db.close()
