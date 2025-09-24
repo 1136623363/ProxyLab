@@ -247,6 +247,105 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "message": "Subscription converter is running normally"}
 
+# 添加通用路由来处理前端SPA
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """服务前端文件，支持SPA路由"""
+    # 如果是API请求，让FastAPI处理
+    if full_path.startswith(("api/", "auth/", "health", "docs", "openapi.json")):
+        raise HTTPException(status_code=404, detail="Not found")
+
+    # 检查是否是静态文件
+    static_file_path = f"static/{full_path}"
+    if os.path.exists(static_file_path) and os.path.isfile(static_file_path):
+        return FileResponse(static_file_path)
+
+    # 默认返回index.html（SPA路由）
+    index_path = "static/index.html"
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+
+    # 如果前端文件不存在，返回简单的404页面
+    return HTMLResponse(content=f"""
+    <!DOCTYPE html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>页面未找到 - 订阅转换器</title>
+        <style>
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: #f5f7fa;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }}
+            .container {{
+                text-align: center;
+                background: white;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                padding: 40px;
+                max-width: 500px;
+            }}
+            h1 {{
+                color: #333;
+                margin-bottom: 20px;
+                font-size: 48px;
+            }}
+            p {{
+                color: #666;
+                margin-bottom: 20px;
+                line-height: 1.6;
+            }}
+            .btn {{
+                display: inline-block;
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                margin: 0 5px;
+            }}
+            .btn:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            }}
+            .debug {{
+                margin-top: 20px;
+                padding: 15px;
+                background: #f8f9fa;
+                border-radius: 5px;
+                font-family: monospace;
+                font-size: 12px;
+                text-align: left;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>404</h1>
+            <p>请求的路径: <code>{full_path}</code></p>
+            <p>前端文件可能没有正确构建到 <code>static/</code> 目录中。</p>
+            <a href="/" class="btn">返回首页</a>
+            <a href="/docs" class="btn">API 文档</a>
+            <div class="debug">
+                <strong>调试信息:</strong><br>
+                静态文件路径: static/{full_path}<br>
+                文件存在: {os.path.exists(f"static/{full_path}")}<br>
+                index.html存在: {os.path.exists("static/index.html")}<br>
+                static目录内容: {os.listdir("static") if os.path.exists("static") else "目录不存在"}
+            </div>
+        </div>
+    </body>
+    </html>
+    """, status_code=404)
+
 @app.get("/api/subscription/{link_id}")
 async def get_public_subscription(
     link_id: str,

@@ -55,7 +55,7 @@ COPY --chown=appuser:appuser config.py ./
 COPY --chown=appuser:appuser run.py ./
 
 # 从frontend-builder阶段复制构建的前端文件
-COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/dist ./static/
+COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/dist/ ./static/
 
 # 创建必要的目录
 RUN mkdir -p static data logs && \
