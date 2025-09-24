@@ -39,9 +39,11 @@ class Config:
         f"http://localhost:{PORT}",
         f"http://127.0.0.1:{PORT}",
         f"http://{HOST}:{PORT}",
-        # 生产环境应该通过环境变量配置
-        *os.getenv("CORS_ORIGINS", "").split(",") if os.getenv("CORS_ORIGINS") else []
     ]
+    
+    # 添加环境变量中的CORS源
+    if os.getenv("CORS_ORIGINS"):
+        CORS_ORIGINS.extend(os.getenv("CORS_ORIGINS", "").split(","))
     
     # 开发环境额外允许的源
     if DEBUG:

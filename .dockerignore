@@ -58,6 +58,8 @@ requirements-dev.txt
 setup.py
 start-all.py
 quick-start.py
+test-*.py
+test-*.sh
 
 # Database files
 *.db
@@ -67,3 +69,14 @@ quick-start.py
 # Temporary files
 tmp/
 temp/
+
+# Test files
+tests/
+test_*/
+
+# Documentation
+*.md
+!README.md
+
+# Scripts
+scripts/
