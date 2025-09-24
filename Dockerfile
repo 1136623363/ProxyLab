@@ -1,4 +1,4 @@
-# 多阶段构建 - 整合前后端和Nginx
+# 多阶段构建 - 整合前后端
 FROM node:18-alpine as frontend-builder
 
 # 构建前端
@@ -30,13 +30,11 @@ ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir -r requirements.txt
 
-# 生产阶段 - 整合Nginx
+# 生产阶段 - 纯FastAPI
 FROM python:3.11-slim
 
-# 安装Nginx和必要工具
+# 安装必要工具
 RUN apt-get update && apt-get install -y \
-    nginx \
-    supervisor \
     curl \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
@@ -60,36 +58,11 @@ COPY --chown=appuser:appuser run.py ./
 COPY --from=frontend-builder --chown=appuser:appuser /app/frontend/dist ./static/
 
 # 创建必要的目录
-RUN mkdir -p static data logs /var/log/nginx /var/lib/nginx /var/cache/nginx && \
+RUN mkdir -p static data logs && \
     chown -R appuser:appuser /app
 
-# 配置Nginx
-COPY nginx.conf /etc/nginx/nginx.conf
-RUN chown -R appuser:appuser /var/log/nginx /var/lib/nginx /var/cache/nginx /etc/nginx
-
-# 配置Supervisor
-RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'nodaemon=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'user=root' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '[program:nginx]' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'command=nginx -g "daemon off;"' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stderr_logfile=/var/log/nginx/error.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stdout_logfile=/var/log/nginx/access.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo '[program:app]' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'command=uvicorn app.main:app --host 0.0.0.0 --port 8001 --workers 2 --access-log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'directory=/app' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'user=appuser' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autostart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'autorestart=true' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stderr_logfile=/app/logs/app_error.log' >> /etc/supervisor/conf.d/supervisord.conf && \
-    echo 'stdout_logfile=/app/logs/app_access.log' >> /etc/supervisor/conf.d/supervisord.conf
-
 # 暴露端口
-EXPOSE 80 8001
+EXPOSE 80
 
 # 设置环境变量
 ENV PYTHONPATH=/app
@@ -100,7 +73,7 @@ ENV PYTHONIOENCODING=utf-8
 
 # 健康检查
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8001/health || exit 1
+    CMD curl -f http://localhost:80/health || exit 1
 
 # 启动命令
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80", "--workers", "2", "--access-log"]

@@ -110,6 +110,9 @@ if not os.path.exists("static"):
     os.makedirs("static")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# 添加静态文件路由，支持前端SPA
+from fastapi.responses import FileResponse
+
 # 全局异常处理器
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
